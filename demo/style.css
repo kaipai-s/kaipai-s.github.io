@@ -1,0 +1,25 @@
+*{
+    margin: 0;
+}
+body{
+   /* background-image: linear-gradient(#000, #333);*/
+    background: #000;
+/*    background-image: url("./mode/webBG.png");
+    background-size: cover;*/
+}
+
+#load{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #000 url("./mode/LOGO.png") no-repeat 50% 50%;
+    z-index: 999;
+}
+
+
+canvas {
+    width: 1024px;
+    height: 1024px;
+}
