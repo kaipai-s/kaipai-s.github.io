@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Title</title>
-    <link type="text/css" rel="styleSheet"  href="style.css" />
+    <link type="text/css" rel="styleSheet"  href="demo/style.css" />
     <style type="text/css">
 
     </style>
@@ -26,20 +26,18 @@
             var messageObj = { text:'子窗口给父窗口传值', a: 111111, b: 2 }
             // 向该窗口发送消息       
             window.parent.postMessage(messageObj, "*");
-            
+
         }*/
 
 
 
 
-        import * as THREE from '../build/three.module1.js'
-        import { OrbitControls } from './jsm1/controls/OrbitControls.js'
-        import { GLTFLoader  } from './jsm1/loaders/GLTFLoader.js'
-        import { RGBELoader } from './jsm1/loaders/RGBELoader.js'
-        import { FlakesTexture } from './jsm1/textures/FlakesTexture.js';
-
-
-        import { RectAreaLightUniformsLib } from './jsm1/lights/RectAreaLightUniformsLib.js';
+        import * as THREE from './build/three.module1.js'
+        import { OrbitControls } from './demo/jsm1/controls/OrbitControls.js'
+        import { GLTFLoader  } from './demo/jsm1/loaders/GLTFLoader.js'
+        import { RGBELoader } from './demo/jsm1/loaders/RGBELoader.js'
+        import { FlakesTexture } from './demo/jsm1/textures/FlakesTexture.js';
+        import { RectAreaLightUniformsLib } from './demo/jsm1/lights/RectAreaLightUniformsLib.js';
 
         //import { TWEEN } from './lib/tween.min.js';
 
@@ -135,7 +133,7 @@
         const loader = new GLTFLoader();
         // Load a glTF resource
         loader.load(
-            'mode/ooo.glb',
+            'demo/mode/ooo.glb',
             function ( gltf ) {
 
                 gltf.scene.scale.set(0.7,0.7,0.7);
@@ -191,7 +189,7 @@
                 //加载车漆AO
                 let textureAo = new THREE.Texture();
                 let imgLoaderAo = new THREE.ImageLoader();
-                imgLoaderAo.load('mode/cheshen.png',function(img1)
+                imgLoaderAo.load('demo/mode/cheshen.png',function(img1)
                 {
                     //将图片值赋于纹理
                     textureAo.image = img1;
@@ -220,14 +218,14 @@
 
                 const textureLoader = new THREE.TextureLoader();
 
-                const diffuse = textureLoader.load( "mode/Carbon.png" );
+                const diffuse = textureLoader.load( "demo/mode/Carbon.png" );
                 diffuse.encoding = THREE.sRGBEncoding;
                 diffuse.wrapS = THREE.RepeatWrapping;
                 diffuse.wrapT = THREE.RepeatWrapping;
                 diffuse.repeat.x = 60;
                 diffuse.repeat.y = 60;
 
-                const normalMap = textureLoader.load( "mode/Carbon_Normal.png" );
+                const normalMap = textureLoader.load( "demo/mode/Carbon_Normal.png" );
                 normalMap.wrapS = THREE.RepeatWrapping;
                 normalMap.wrapT = THREE.RepeatWrapping;
 
@@ -305,7 +303,7 @@
 
                 //加载图片
                 var imgLoader_d = new THREE.ImageLoader();
-                imgLoader_d.load('mode/l.png',function(img_d)
+                imgLoader_d.load('demo/mode/l.png',function(img_d)
                 {
                     //将图片值赋于纹理
                     texture_d.image = img_d;
@@ -373,7 +371,7 @@
         //汽车阴影
         let textureCar = new THREE.Texture();
         let imgLoaderCar = new THREE.ImageLoader();
-        imgLoaderCar.load('mode/BG.jpg',function(img1)
+        imgLoaderCar.load('demo/mode/BG.jpg',function(img1)
         {
             //将图片值赋于纹理
             textureCar.image = img1;
@@ -392,7 +390,7 @@
 
         let textureFloorMap = new THREE.Texture();
         let imgLoaderFloorMap = new THREE.ImageLoader();
-        imgLoaderFloorMap.load('mode/floorBg.jpg',function(img1)
+        imgLoaderFloorMap.load('demo/mode/floorBg.jpg',function(img1)
         {
             //将图片值赋于纹理
             textureFloorMap.image = img1;
@@ -417,7 +415,7 @@
         pmremGenerator.compileEquirectangularShader()
         new RGBELoader()
             .setDataType(THREE.UnsignedByteType)
-            .load('hdr/11.hdr', function(texture) {
+            .load('demo/hdr/11.hdr', function(texture) {
                 const envMap = pmremGenerator.fromEquirectangular(texture).texture;
                 envMap.isPmremTexture = true
                 pmremGenerator.dispose()
