@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Title</title>
+    <link type="text/css" rel="styleSheet"  href="style.css" />
+    <style type="text/css">
+
+    </style>
+
+
+
+    <script>
+
+    </script>
+
+
+    <script type="module">
+
+       /* window.addEventListener('message', function (event) {
+            console.log(`子窗口捕获消息`)
+        })
+
+        function sendPost() {
+            var messageObj = { text:'子窗口给父窗口传值', a: 111111, b: 2 }
+            // 向该窗口发送消息       
+            window.parent.postMessage(messageObj, "*");
+
+        }*/
+
+
+
+
+        import * as THREE from './build/three.module1.js'
+        import { OrbitControls } from './jsm1/controls/OrbitControls.js'
+        import { GLTFLoader  } from './jsm1/loaders/GLTFLoader.js'
+        import { RGBELoader } from './jsm1/loaders/RGBELoader.js'
+        import { FlakesTexture } from './jsm1/textures/FlakesTexture.js';
+        import { RectAreaLightUniformsLib } from './jsm1/lights/RectAreaLightUniformsLib.js';
+
+        //import { TWEEN } from './lib/tween.min.js';
+
+/*        import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+        import { SSAOPass } from './jsm/postprocessing/SSAOPass.js';
+        import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+        import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+        import { CopyShader } from './jsm/shaders/CopyShader.js';
+        import { FXAAShader } from './jsm/shaders/FXAAShader.js';
+
+
+        import { RectAreaLightUniformsLib } from './jsm/lights/RectAreaLightUniformsLib.js'
+        import { RectAreaLightHelper } from './jsm/helpers/RectAreaLightHelper.js'*/
+
+
+
+
+        const scene = new THREE.Scene();
+        RectAreaLightUniformsLib.init();
+        const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1500 );
+        camera.position.y = 280;
+        camera.position.z = 380;
+        camera.position.x = 380;
+
+        scene.fog = new THREE.Fog( 0x000000, 930, 1400);
+
+
+        const renderer = new THREE.WebGLRenderer({antialias: true,alpha:true});
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        //renderer.outputEncoding = THREE.sRGBEncoding;
+        const controls = new OrbitControls( camera, renderer.domElement );
+        controls.update();
+        controls.enableDamping = true
+
+
+        const lightA = new THREE.AmbientLight( 0xcccccc ); // soft white light
+        //scene.add( lightA );
+        const directionalLight = new THREE.DirectionalLight( 0xcccccc,1);
+        directionalLight.castShadow = true;
+
+        const spotLight = new THREE.SpotLight( 0xffffff,8,350,Math.PI/6 );
+        spotLight.position.set( 0, 350, 0 );
+
+        spotLight.castShadow = true;
+
+        spotLight.shadow.mapSize.width = 1024;
+        spotLight.shadow.mapSize.height = 1024;
+
+        spotLight.shadow.camera.near = 200;
+        spotLight.shadow.camera.far = 600;
+        spotLight.shadow.camera.fov = 30;
+
+        scene.add( spotLight );
+
+
+        const rectLight1 = new THREE.RectAreaLight( 0xffffff, 50, 40, 100 );
+        rectLight1.position.set( 150, 5, 0 );
+        rectLight1.rotateX(Math.PI/2)
+        scene.add( rectLight1 );
+        //scene.add( new RectAreaLightHelper( rectLight1 ) );
+
+
+        const rectLight2 = new THREE.RectAreaLight( 0xffffff, 50, 40, 100 );
+        rectLight2.position.set( -150, 5, 0 );
+        rectLight2.rotateX(Math.PI/2)
+        //scene.add( rectLight2 );
+        //scene.add( new RectAreaLightHelper( rectLight2 ) );
+
+
+
+        const rectLight3 = new THREE.RectAreaLight( 0xffffff, 80, 7, 300 );
+        rectLight3.position.set( 0, 160, 0 );
+        rectLight3.rotateX(-Math.PI/2)
+        //scene.add( rectLight3 );
+        //scene.add( new RectAreaLightHelper( rectLight3 ) );
+
+
+
+        document.body.appendChild( renderer.domElement );
+
+
+
+
+
+        let luntaiGroup0
+        let luntaiGroup1
+        let luntaiGroup2
+
+        let mode
+        let group = new Array();
+        // Instantiate a loader
+        const loader = new GLTFLoader();
+        // Load a glTF resource
+        loader.load(
+            'mode/ooo.glb',
+            function ( gltf ) {
+
+                gltf.scene.scale.set(0.7,0.7,0.7);
+
+
+                //gltf.scene.children[0].children[0].material.transparent = true;
+                //gltf.scene.children[0].children[0].material.opacity = 0.5;
+
+
+
+                let luntaiArr = ["lungu","lunguhuan","lunguluosi","cetaipi","taipiwai","shachepian","shachehuan","shachehuan2"]
+
+                luntaiGroup0 = new THREE.Group();
+                luntaiGroup1 = new THREE.Group();
+                luntaiGroup2 = new THREE.Group();
+                let luntaiNum = [luntaiGroup0,luntaiGroup1,luntaiGroup2]
+
+
+                for(let n = 0; n<luntaiNum.length; n++){
+
+                    for(let i = 0; i<luntaiArr.length; i++){
+                        luntaiNum[n].add(gltf.scene.getObjectByName(luntaiArr[i]).clone())
+                    }
+                }
+
+                luntaiGroup0.scale.set(0.73,0.73,0.73);
+                luntaiGroup1.scale.set(0.7,0.7,0.7);
+                luntaiGroup2.scale.set(0.73,0.73,0.73);
+
+                scene.add(luntaiGroup0)
+                scene.add(luntaiGroup1)
+                scene.add(luntaiGroup2)
+
+
+                luntaiGroup0.rotateY(Math.PI).translateX(-7).translateZ(-3)//右后
+                luntaiGroup1.rotateY(Math.PI).translateZ(-170)
+                luntaiGroup2.translateZ(-175).translateX(-7)  //左后
+
+
+
+
+                //车漆
+
+                const normalMap3 = new THREE.CanvasTexture( new FlakesTexture() );
+                normalMap3.wrapS = THREE.RepeatWrapping;
+                normalMap3.wrapT = THREE.RepeatWrapping;
+                normalMap3.repeat.x = 20;
+                normalMap3.repeat.y = 20;
+                normalMap3.anisotropy = 32;
+
+
+
+                //加载车漆AO
+                let textureAo = new THREE.Texture();
+                let imgLoaderAo = new THREE.ImageLoader();
+                imgLoaderAo.load('mode/cheshen.png',function(img1)
+                {
+                    //将图片值赋于纹理
+                    textureAo.image = img1;
+                    textureAo.needsUpdate = true;
+                });
+
+
+
+
+                let material1 = new THREE.MeshPhysicalMaterial( {
+                    clearcoat: 1.0,
+                    clearcoatRoughness: 0.1,
+                    metalness: 0.5,
+                    roughness: 0.5,
+                    color: 0x856521,
+                    normalMap: normalMap3,
+                    normalScale: new THREE.Vector2( 0.035, 0.035 ),
+                    side:THREE.DoubleSide,
+                    //map:textureAo,
+                    //aoMapIntensity  :0.7,
+                } );
+
+
+                //碳纤维
+
+
+                const textureLoader = new THREE.TextureLoader();
+
+                const diffuse = textureLoader.load( "mode/Carbon.png" );
+                diffuse.encoding = THREE.sRGBEncoding;
+                diffuse.wrapS = THREE.RepeatWrapping;
+                diffuse.wrapT = THREE.RepeatWrapping;
+                diffuse.repeat.x = 60;
+                diffuse.repeat.y = 60;
+
+                const normalMap = textureLoader.load( "mode/Carbon_Normal.png" );
+                normalMap.wrapS = THREE.RepeatWrapping;
+                normalMap.wrapT = THREE.RepeatWrapping;
+
+                let material3 = new THREE.MeshPhysicalMaterial( {
+                    roughness: 0.3,
+                    clearcoat: 1.0,
+                    clearcoatRoughness: 0.3,
+                    map: diffuse,
+                    normalMap: normalMap
+                } );
+
+
+                gltf.scene.getObjectByName("zhengliuban").material = material3;
+                gltf.scene.getObjectByName("zhengliugan").material = material3;
+                gltf.scene.getObjectByName("zhengliugan2").material = material3;
+                gltf.scene.getObjectByName("zhengliuce").material = material3;
+                gltf.scene.getObjectByName("zhengliuce_2").material = material3;
+                gltf.scene.getObjectByName("zuofangguang").material = material3;
+                gltf.scene.getObjectByName("cezhuangshikuai").material = material3;
+                gltf.scene.getObjectByName("qiandangfengtiao2").material = material3;
+
+
+                //自发光
+
+
+                let emissivemat = new THREE.MeshPhysicalMaterial({
+                    emissive:0xf2f2f2,
+                    //emissiveMap: texLoader.load("./mode/light.png"),
+                })
+
+
+
+
+                gltf.scene.getObjectByName("cheshen").children[0].material = material1;
+                gltf.scene.getObjectByName("cheshen").children[1].material = material1;
+                gltf.scene.getObjectByName("cheshen").children[2].material = material1;
+                gltf.scene.getObjectByName("zuoqiankong").material = material1;
+
+                gltf.scene.getObjectByName("zhongkong").material = material1;
+                gltf.scene.getObjectByName("houbaoxiangang").material = material1;
+                gltf.scene.getObjectByName("qiandadenghuan").material = emissivemat;
+                gltf.scene.getObjectByName("zuoxiazhuangshi").material = material1;
+
+
+
+
+
+
+                gltf.scene.getObjectByName("houboli").material.transparent = true;
+                gltf.scene.getObjectByName("houboli").material.opacity = 0.9;
+
+                gltf.scene.getObjectByName("qianboli").material.transparent = true;
+                gltf.scene.getObjectByName("qianboli").material.opacity = 0.8;
+
+                gltf.scene.getObjectByName("houdengzhao").material.transparent = true;
+                gltf.scene.getObjectByName("houdengzhao").material.opacity = 0.4;
+
+                gltf.scene.getObjectByName("houdengzhao2").material.transparent = true;
+                gltf.scene.getObjectByName("houdengzhao2").material.opacity = 0.4;
+
+
+                gltf.scene.getObjectByName("qiandadengzhao").material.transparent = true;
+                gltf.scene.getObjectByName("qiandadengzhao").material.opacity = 0.5;
+
+
+
+
+
+
+
+                console.log(gltf.scene)
+
+                //前车灯
+                var texture_d = new THREE.Texture();
+
+                //加载图片
+                var imgLoader_d = new THREE.ImageLoader();
+                imgLoader_d.load('mode/l.png',function(img_d)
+                {
+                    //将图片值赋于纹理
+                    texture_d.image = img_d;
+                    texture_d.needsUpdate = true;
+
+                });
+
+                var mesh_d = new THREE.MeshStandardMaterial( { map: texture_d, transparent:true,  blending: THREE.AdditiveBlending,depthTest:false} ) ;
+
+                gltf.scene.getObjectByName("qiandadengzhaoin").material = mesh_d;
+
+
+
+
+                //氛围灯罩
+
+/*
+
+
+                var texture_z = new THREE.Texture();
+                var imgLoader_z = new THREE.ImageLoader();
+                imgLoader_z.load('mode/g.png',function(img_d)
+                {
+                    texture_z.image = img_d;
+                    texture_z.needsUpdate = true;
+
+                });
+                var mesh_z = new THREE.MeshStandardMaterial( { map: texture_z, transparent:true,  blending: THREE.AdditiveBlending,depthTest:false} ) ;
+                gltf.scene.getObjectByName("light").material = mesh_z;
+
+
+*/
+
+
+
+
+
+
+                scene.add( gltf.scene );
+
+                mode = gltf.scene.children.length
+                console.log(mode)
+
+
+
+                mode = gltf.scene.children.length
+                //console.log(gltf.scene)
+
+                if(mode !== '')
+                {
+                    //alert(111)
+                }
+               // console.log(mode)
+
+            },
+            function ( xhr ) {
+            // console.log(  xhr  );
+             },
+            function ( error ) {
+               // console.log( 'An error happened' );
+            }
+        );
+
+
+        //汽车阴影
+        let textureCar = new THREE.Texture();
+        let imgLoaderCar = new THREE.ImageLoader();
+        imgLoaderCar.load('mode/BG.jpg',function(img1)
+        {
+            //将图片值赋于纹理
+            textureCar.image = img1;
+            textureCar.needsUpdate = true;
+            textureCar.rotation = 0;
+            textureCar.center.set(0,0);
+            textureCar.offset=new THREE.Vector2(0,0);
+
+        });
+        var meshCar = new THREE.Mesh( new THREE.CircleGeometry( 235, 150 ), new THREE.MeshPhysicalMaterial( { map: textureCar,transparent:true,blending: THREE.MultiplyBlending } ) );
+        meshCar.rotateX(-Math.PI/2)
+        scene.add( meshCar );
+
+
+        //地面
+
+        let textureFloorMap = new THREE.Texture();
+        let imgLoaderFloorMap = new THREE.ImageLoader();
+        imgLoaderFloorMap.load('mode/floorBg.jpg',function(img1)
+        {
+            //将图片值赋于纹理
+            textureFloorMap.image = img1;
+            textureFloorMap.needsUpdate = true;
+            textureFloorMap.rotation = 0;
+            textureFloorMap.center.set(0,0);
+            textureFloorMap.offset=new THREE.Vector2(0,0);
+
+        });
+        const geometry = new THREE.CircleGeometry( 1800, 64 );
+        geometry.rotateX(-Math.PI/2)
+
+
+        const material = new THREE.MeshPhysicalMaterial( {map: textureFloorMap} );
+        const plane = new THREE.Mesh( geometry, material );
+        plane.position.set(0, -1, 0);
+        scene.add( plane );
+
+
+        /*HDR*/
+        const pmremGenerator = new THREE.PMREMGenerator(renderer) // 使用hdr作为背景色
+        pmremGenerator.compileEquirectangularShader()
+        new RGBELoader()
+            .setDataType(THREE.UnsignedByteType)
+            .load('hdr/11.hdr', function(texture) {
+                const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                envMap.isPmremTexture = true
+                pmremGenerator.dispose()
+
+                scene.environment = envMap  // 给场景添加环境光效果
+                //scene.background = envMap // 给场景添加背景图
+
+            })
+
+
+
+
+
+
+        const animate = function () {
+            requestAnimationFrame( animate );
+            onWindowResize();
+
+
+            controls.update();
+            //controls.autoRotate=true;
+            controls.zoomSpeed = 0.4;
+            controls.enableDamping=true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.maxPolarAngle = Math.PI/2.1;
+
+
+            //console.log(controls.getAzimuthalAngle())
+
+            //scene.getObjectByName("light").rotation.y = controls.getAzimuthalAngle() + Math.PI/2;
+            //scene.getObjectByName("light").rotation.z = controls.getPolarAngle();
+
+
+
+
+
+            if(mode == 47) {
+            mode++
+                sendPost()
+            }
+
+
+
+
+
+
+
+                //meshd.rotation.y += 0.01;
+
+/*
+            scene.getObjectByName("lungu").rotation.x -= 0.03;
+            scene.getObjectByName("cetaipi").rotation.x -= 0.03;
+            scene.getObjectByName("lunguluosi").rotation.x -= 0.03;
+            scene.getObjectByName("shachehuan").rotation.x -= 0.03;
+            scene.getObjectByName("shachehuan2").rotation.x -= 0.03;
+            scene.getObjectByName("lunguhuan").rotation.x -= 0.03;*/
+
+/*
+            luntaiGroup0.getObjectByName("lungu").rotation.x -= 0.03;
+            luntaiGroup0.getObjectByName("cetaipi").rotation.x -= 0.03;
+            luntaiGroup0.getObjectByName("lunguluosi").rotation.x -= 0.03;
+            luntaiGroup0.getObjectByName("shachehuan").rotation.x -= 0.03;
+            luntaiGroup0.getObjectByName("shachehuan2").rotation.x -= 0.03;
+            luntaiGroup0.getObjectByName("lunguhuan").rotation.x -= 0.03;
+
+            luntaiGroup1.getObjectByName("lungu").rotation.x -= 0.03;
+            luntaiGroup1.getObjectByName("cetaipi").rotation.x -= 0.03;
+            luntaiGroup1.getObjectByName("lunguluosi").rotation.x -= 0.03;
+            luntaiGroup1.getObjectByName("shachehuan").rotation.x -= 0.03;
+            luntaiGroup1.getObjectByName("shachehuan2").rotation.x -= 0.03;
+            luntaiGroup1.getObjectByName("lunguhuan").rotation.x -= 0.03;
+
+
+            luntaiGroup2.getObjectByName("lungu").rotation.x -= 0.03;
+            luntaiGroup2.getObjectByName("cetaipi").rotation.x -= 0.03;
+            luntaiGroup2.getObjectByName("lunguluosi").rotation.x -= 0.03;
+            luntaiGroup2.getObjectByName("shachehuan").rotation.x -= 0.03;
+            luntaiGroup2.getObjectByName("shachehuan2").rotation.x -= 0.03;
+            luntaiGroup2.getObjectByName("lunguhuan").rotation.x -= 0.03;*/
+
+
+            //scene.getObjectByName("light").rotation.y -= 0.001;
+
+
+            //texturecanvas.needsUpdate = true;
+
+
+
+
+
+
+
+
+
+            //textureFloor.needsUpdate = true;
+
+            renderer.render( scene, camera );
+            //composer.render();
+        };
+
+        function onWindowResize() {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize( window.innerWidth, window.innerHeight );
+
+        }
+
+        animate();
+
+
+    </script>
+
+</head>
+<body>
+<div class="wrap">
+    <canvas style="display: none; background: #000" id="myCanvas" width="400" height="400"></canvas>
+</div>
+</body>
+</html>
