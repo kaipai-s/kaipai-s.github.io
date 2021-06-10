@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        *{
+            margin: 0;
+        }
+        html, body{
+            height: 100%;
+        }
+      
+		p{
+		font-size:50px;
+		}
+    </style>
+    <script>
+
+        window.addEventListener('message', function (event) {
+            console.log(`子窗口捕获消息`)
+        })
+
+
+            var messageObj = { text:'子窗口给父窗口传值', a: 111111, b: 2 }
+            // 向该窗口发送消息       
+            window.parent.postMessage(messageObj, "*");
+
+
+    </script>
+</head>
+<body>
+<p>ppppppppppppppppppp</p>
+</body>
+</html>
