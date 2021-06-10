@@ -5,10 +5,7 @@
     <title>Title</title>
     <link type="text/css" rel="styleSheet"  href="style.css" />
     <style type="text/css">
-        @font-face {
-            font-family: 'zcool';
-            src: url('font/zcool.ttf') format('truetype')
-        }
+
         canvas{
             letter-spacing: 5px;
         }
@@ -66,52 +63,6 @@
         }
 
         sendPost()
-
-
-        var alphaV
-        var betaV
-        var gammaV
-
-        if (window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientation', function (event) {
-                var a = document.getElementById('alpha'),
-                    b = document.getElementById('beta'),
-                    g = document.getElementById('gamma'),
-                    alpha = event.alpha,
-                    beta = event.beta,
-                    gamma = event.gamma;
-
-                a.innerHTML = alpha;
-                b.innerHTML = beta;
-                g.innerHTML = gamma;
-
-                alphaV = alpha;
-                betaV = beta;
-                gammaV = gamma;
-
-            }, false);
-        } else {
-            document.querySelector('body').innerHTML = '你的浏览器不支持陀螺仪';
-        }
-
-
-
-
-
-        $('.Gravity').on('click',function(){
-            // ios 提示授权， 返回的是一个 promise
-            window.DeviceOrientationEvent.requestPermission()
-                .then(state => {
-                    if(state === "granted"){//允许
-                        alert("允许使用陀螺仪：",state)
-                    }else if(state === "denied"){//拒绝
-                        alert("拒绝使用陀螺仪：",state)
-                    }else if(state === "prompt"){
-                        alert("用户进行其他操作：",state)
-                    }
-                })
-        })
-
 
 
 
@@ -437,8 +388,6 @@
 
 
                     renderer.render(scene, camera);
-                    scene.rotation.y = gammaV * Math.PI/180/1.5
-                    scene.rotation.x = betaV * Math.PI/180/3 - 0.2
                     controls.update();
 
 
@@ -480,11 +429,8 @@
     </script>
 
 </head>
-<body style="background:transparent;">
+<body style="background: black">
 <div class="btn">
-    alpha:<span id="alpha"></span><br/>
-    beta:<span id="beta"></span><br/>
-    gamma:<span id="gamma"></span><br/>
 <button class="Gravity" id="btnbq">表情</button>
 <button id="btntext">文字</button>
 </div>
