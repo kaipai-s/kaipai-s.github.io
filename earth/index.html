@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link type="text/css" rel="styleSheet"  href="style.css" />
+    <script src="./lib/TweenMax.js"> </script>
+    <script type="module">
+
+
+
+        window.addEventListener('message', function (event) {
+            console.log(`子窗口捕获消息`)
+        })
+
+
+        var messageObj = { text:'子窗口给父窗口传值', a: 111111, b: 2 }
+        // 向该窗口发送消息       
+        window.parent.postMessage(messageObj, "*");
+
+
+
+
+/*
+
+        import * as THREE from 'https://unpkg.com/three@0.123.0/build/three.module.js';
+        import { OrbitControls } from 'https://unpkg.com/three/examples/jsm/controls/OrbitControls.js';
+        import { RGBELoader } from 'https://unpkg.com/three/examples/jsm/loaders/RGBELoader.js'
+        import { FlakesTexture } from 'https://unpkg.com/three/examples/jsm/textures/FlakesTexture.js';
+        import { GLTFLoader  } from 'https://unpkg.com/three/examples/jsm/loaders/GLTFLoader.js'
+
+*/
+
+
+        import * as THREE from './build/three.module.js'
+        import { OrbitControls } from './jsm1/controls/OrbitControls.js'
+        import { GLTFLoader  } from './jsm1/loaders/GLTFLoader.js'
+        import { RGBELoader } from './jsm1/loaders/RGBELoader.js'
+        import { FlakesTexture } from './jsm1/textures/FlakesTexture.js';
+
+
+
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        camera.position.x = 13;
+        const renderer = new THREE.WebGLRenderer({antialias: true,alpha:true});
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        const controls = new OrbitControls( camera, renderer.domElement );
+        controls.update();
+        controls.enableDamping = true;
+
+        var axes = new THREE.AxisHelper(10);
+        //scene.add(axes);
+
+
+        const spotLight = new THREE.SpotLight( 0xffffff );
+        spotLight.position.set( 0, 0, 30 );
+
+        spotLight.castShadow = true;
+
+        spotLight.shadow.mapSize.width = 1024;
+        spotLight.shadow.mapSize.height = 1024;
+
+        spotLight.shadow.camera.near = 0;
+        spotLight.shadow.camera.far = 150;
+        spotLight.shadow.camera.fov = 30;
+
+       // scene.add( spotLight );
+
+
+        //controls.autoRotate = true;
+        scene.fog = new THREE.Fog( 0x000000, 8, 30);
+        document.body.appendChild( renderer.domElement );
+/*
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+        const cube = new THREE.Mesh( geometry, material );
+        scene.add( cube );*/
+
+/*
+
+        var sceneBg;
+        function initScene() {
+            sceneBg = new THREE.Scene();
+            var bgTexture = new THREE.TextureLoader().load("img/universe.jpg");
+            sceneBg.background = bgTexture;
+        }
+        initScene();
+
+*/
+
+
+        const texture = new THREE.TextureLoader().load( "img/earth-glow.jpg" );
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.offset.z = 0.25
+        texture.rotation = -Math.PI/2
+
+        const geometry1 = new THREE.PlaneGeometry( 9.6, 9.6, 32 );
+        const material1 = new THREE.MeshBasicMaterial( {
+            map: texture,
+            size: THREE.DoubleSide,
+            color:new THREE.Color("rgb(3, 240, 255)"),
+            transparent:true,
+            blending:THREE.AdditiveBlending,
+           depthTest:false
+
+
+        } );
+        const plane = new THREE.Mesh( geometry1, material1 );
+
+        let group2=new THREE.Group()
+
+        plane.position.z=0
+        group2.add(plane)
+        //scene.add(group2)
+
+        //plane.rotation.y = Math.PI/2
+
+        //scene.add( plane );
+
+
+
+        var texturemap
+
+        //背景动画
+        var textureBg = new THREE.TextureLoader().load( "img/universe.jpg" );
+        textureBg.wrapS = THREE.RepeatWrapping;
+        textureBg.wrapT = THREE.RepeatWrapping;
+        textureBg.repeat.set( 1, 1 );
+
+
+        var materialBg = new THREE.MeshBasicMaterial( {
+            color: 0x00b4ff,
+            transparent:true,
+            map:textureBg,
+            blending:THREE.AdditiveBlending,
+            opacity:1,
+            depthTest:false
+        } );
+
+
+        var textureBgText = new THREE.TextureLoader().load( "img/universeText.jpg" );
+        textureBgText.wrapS = THREE.RepeatWrapping;
+        textureBgText.wrapT = THREE.RepeatWrapping;
+        textureBgText.repeat.set( 1, 1 );
+
+
+        var materialBgText = new THREE.MeshBasicMaterial( {
+            color: 0x00b4ff,
+            transparent:true,
+            map:textureBgText,
+            blending:THREE.AdditiveBlending,
+            opacity:1,
+            depthTest:false
+        } );
+
+
+        //地板动画
+        var textureBottom = new THREE.TextureLoader().load( "img/bottomBg.jpg" );
+        textureBottom.wrapS = THREE.RepeatWrapping;
+        textureBottom.wrapT = THREE.RepeatWrapping;
+        textureBottom.repeat.set( 1, 1 );
+
+
+        var materialBottom = new THREE.MeshBasicMaterial( {
+            color: 0x00f5fe,
+            transparent:true,
+            map:textureBottom,
+            blending:THREE.AdditiveBlending,
+            opacity:1,
+            depthTest:false
+        } );
+
+        const loader = new GLTFLoader();
+        // Load a glTF resource
+        loader.load(
+            'o.glb',
+            function ( gltf ) {
+
+                gltf.scene.scale.set(4.7,4.7,4.7);
+
+                 gltf.scene.getObjectByName("Plane").material = material1;
+                 gltf.scene.getObjectByName("Cylinder").material = materialBg;
+                 gltf.scene.getObjectByName("top").material = materialBottom;
+                 gltf.scene.getObjectByName("bottom").material = materialBottom;
+                gltf.scene.getObjectByName("CylinderText").material = materialBgText;
+
+
+
+                scene.add( gltf.scene );
+
+                //console.log(gltf.scene)
+
+                console.log()
+
+            },
+            function ( xhr ) {
+
+                console.log(  xhr  );
+
+
+            },
+            function ( error ) {
+                console.log( 'An error happened' );
+            }
+        );
+
+
+
+        //地图轮廓
+        texturemap = new THREE.TextureLoader().load( "img/mapLine.png" );
+        texturemap.wrapS = THREE.RepeatWrapping;
+        texturemap.wrapT = THREE.RepeatWrapping;
+        texturemap.repeat.set( 1, 1 );
+        texturemap.offset.x = 0.25
+
+
+        const geometry = new THREE.SphereGeometry( 3, 100, 100 );
+        const material = new THREE.MeshBasicMaterial( {
+            color: 0x00b4ff,
+            transparent:true,
+            map:texturemap,
+            blending:THREE.AdditiveBlending,
+            opacity:1
+        } );
+        const sphere = new THREE.Mesh( geometry, material );
+        scene.add( sphere );
+
+
+
+        const geometrylight = new THREE.SphereGeometry( 3, 100, 100 );
+        const materiallight = new THREE.MeshStandardMaterial ( {
+            color: 0x000000,
+            transparent:true,
+            opacity:0.65,
+            roughness: 0.4,
+            metalness: 0.8,
+
+
+        } );
+        const spherelight = new THREE.Mesh( geometrylight, materiallight );
+        scene.add( spherelight );
+
+
+        imgTodata("img/map.png","3","0.8","#02f7fa","ddd")
+        function imgTodata(src, r, d, pcolor, name, imgCallBack) {
+
+
+            var globes;
+            var imgData = [];
+            var image = new Image;
+
+            image.src = src;
+
+            image.onload = function () {
+
+                var canvas = document.createElement("canvas");
+                canvas.width = image.width;
+                canvas.height = image.height;
+                imgData.width = image.width;
+                imgData.height = image.height;
+                var context = canvas.getContext("2d");
+                context.drawImage(image, 0, 0, image.width, image.height);
+                var data = context.getImageData(0, 0, canvas.width, canvas.height);
+                var dLength = data.data.length;
+                console.log(dLength)
+                for (var i = 0; i < dLength; i += 4) {
+                    var x = (i / 4) % canvas.width;
+                    var y = (i / 4 - x) / canvas.width;
+                    if (i / 4 % 3 == 1 && y % 4 == 1 && 0 === data.data[i]) {
+                        var u = (360 / canvas.width) * x - 180;
+                        var v = (180 / canvas.height) * y - 90;
+                        var xyz = uvToxyz(u, v, r);
+                        imgData.push(xyz);
+                    }
+                }
+                var globeGeometry = new THREE.BufferGeometry();
+                var positionsa = [];
+                var colors = [];
+                var color = new THREE.Color();
+                var sprite = new THREE.TextureLoader().load('img/s.png');
+
+
+             /*   imgData.forEach(e => {
+                    positionsa.push(e[0], e[1], e[2]);
+                });*/
+
+                for(var n=0;n<imgData.length;n++){
+                    for(var m=0;m<3;m++){
+                        positionsa.push(imgData[n][m]);
+                        // 颜色
+                        let vx = 184/360;
+                        let vy = 0.89;
+                        let vz = Math.abs(Math.random() -0.5)/2 + 0.1;
+
+                        color.setHSL(vx, vy, vz);
+
+                        colors.push(color.r, color.g, color.b);
+                    }
+
+                }
+
+               // console.log(imgData.length)
+                globeGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positionsa, 3));
+                globeGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+                var globeMaterial = new THREE.PointsMaterial({
+                    size: 0.03,
+                    sizeAttenuation: true,
+                    vertexColors: THREE.VertexColors,
+                    transparent: true,
+                    opacity: 0.4,
+                    blending:THREE.AdditiveBlending,
+                    depthTest:false,
+                    //color: pcolor,
+                    //map: sprite,
+                    // side: THREE.DoubleSide,
+                    //transparent:true,
+                    //opacity: 0.8,
+                    //alphaTest: 0.5,
+                });
+
+                globeGeometry.computeBoundingSphere();
+                globes = new THREE.Points(globeGeometry, globeMaterial);
+                console.log(globes)
+                globes.name = name;
+                scene.add(globes)
+
+
+                //imgCallBack.call(this, globes);
+            }
+        }
+
+        // 经纬度 转 xyz  uv to xyz
+        function uvToxyz(u, v, r) {
+            var wd = (u + 90) * Math.PI / 180,
+                jd = v * Math.PI / 180,
+                x = -r * Math.cos(jd) * Math.cos(wd),
+                y = -r * Math.sin(jd),
+                z = r * Math.cos(jd) * Math.sin(wd);
+            return [x, y, z];
+        }
+
+
+        var flyline;
+        function addline(){
+            var curve = new THREE.CubicBezierCurve3(
+                new THREE.Vector3( -7, 0, 0 ),
+                new THREE.Vector3( -3, 10, 0 ),
+                new THREE.Vector3( 3, 10, 0 ),
+                new THREE.Vector3( 7, 0, 0 )
+            );
+            var points = curve.getPoints( 50 );
+
+            var geometry = new THREE.BufferGeometry().setFromPoints( points );
+            var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+            flyline = new THREE.Line( geometry, material );
+
+            //scene.add(flyline);
+        }
+
+        addline();
+
+        var marking = new THREE.Group();
+        /*var _markData = [
+            {x:116,y:39,h:0.3},{x:80,y:12,h:1},{x:14,y:68,h:1.2},{x:42,y:78,h:0.2},{x:11,y:98,h:0.4},{x:41,y:45,h:1.2},
+            {x:41,y:45,h:0.1},{x:78,y:17,h:0.15},{x:58,y:56,h:0.25},{x:85,y:14,h:0.7},{x:17,y:89,h:0.18},{x:124,y:14,h:0.8},
+            {x:34,y:47,h:0.04},{x:44,y:47,h:0.6},{x:21,y:147,h:0.36},{x:41,y:78,h:0.36},{x:11,y:45,h:0.4},{x:41,y:54,h:0.1},
+            {x:23,y:54,h:0.05},{x:90,y:45,h:0.2},{x:36,y:89,h:0.31},{x:14,y:14,h:0.8},{x:11,y:74,h:0.3},{x:47,y:80,h:0.1},
+            {x:12,y:45,h:0.4},{x:56,y:34,h:0.47},{x:54,y:11,h:0.35},{x:78,y:78,h:0.11},{x:11,y:14,h:0.11},{x:74,y:88,h:0.1},
+            {x:74,y:89,h:0.3},{x:73,y:87,h:0.1},{x:73.22,y:88.56,h:0.1},{x:73.89,y:87.56,h:0.5},{x:73.89,y:89.15,h:0.8},{x:75.89,y:86.32,h:0.5},
+            {x:73.85,y:87.25,h:0.3},{x:74,y:87.69,h:0.7},{x:74,y:85.26,h:0.45},{x:72.15,y:85.23,h:0.38},{x:72,y:87.21,h:0.9},{x:74,y:88,h:0.1},{x:74,y:84.98,h:0.3},
+            {x:74,y:87,h:0.7}, {x:73.85,y:87.25,h:0.3},{x:74,y:87.69,h:0.7},{x:74,y:85.26,h:0.45},{x:72.15,y:85.23,h:0.38},{x:72,y:87.21,h:0.9},{x:74,y:88,h:0.1},{x:74,y:84.98,h:0.3},
+            {x:74,y:87,h:0.7}
+            ]*/
+
+
+
+        var _markData = []
+        function dataMade(x,y,number,midux,miduy,hScale) {
+
+        for(var n=0; n<number; n++){
+            var dataOne ={}
+            dataOne.x = x + Math.random()*midux
+            dataOne.y = y + Math.random()*miduy
+            dataOne.h = Math.random()/hScale
+            _markData.push(dataOne)
+        }
+        }
+
+        dataMade(115,39,50,2,2,1) //北京
+        dataMade(115,39,40,4,4,3) //北京
+        dataMade(115,39,60,6,6,3) //北京
+        dataMade(138,36,15,2,6,2) //东京
+        dataMade(120,31,10,4,4,2) //上海
+        dataMade(136,-24,3,3,14,1) //澳大利亚
+        dataMade(136,-24,33,11,14,3) //澳大利亚
+        dataMade(104,36,22,8,8,1) //兰州
+        dataMade(106,29,15,5,5,3) //重庆
+        dataMade(62,39,12,3,3,3) //重庆
+        dataMade(6,17,13,10,4,2) //重庆
+        dataMade(-56,-14,30,3,3,1.3) //非洲
+        dataMade(-56,-14,30,11,11,3) //非洲
+        dataMade(-596,48,30,7,7,3) //俄罗斯
+        dataMade(-322,54,23,5,5,1) //欧洲
+        dataMade(-322,54,40,7,7,3) //欧洲2
+        dataMade(-322,54,40,24,24,3) //欧洲2
+        dataMade(-296,55,32,3,3,1) //俄罗斯
+        dataMade(-296,55,50,8,12,3) //俄罗斯
+        dataMade(244,48,30,4,4,1.2) //北美
+        dataMade(244,48,50,8,10,3) //北美
+        dataMade(0,0,10,3,3,1) //北美
+        dataMade(0,0,50,-15,15,3) //北美
+
+
+        console.log(_markData)
+
+        const textureMark = new THREE.TextureLoader().load( "img/s.png" );
+        texturemap.wrapS = THREE.RepeatWrapping;
+        texturemap.wrapT = THREE.RepeatWrapping;
+        texturemap.repeat.set( 1, 1 );
+
+        for (var i = 0; i < _markData.length; i++) {
+            // 创建标记点
+            var mark = new THREE.CircleGeometry( 0.05, 32 );
+            var markMaterial = new THREE.MeshBasicMaterial( {
+                map: textureMark,
+                transparent: true,
+                color:new THREE.Color("rgb(255, 56, 56)"),
+                blending:THREE.AdditiveBlending,
+                depthTest:false,
+
+            } );
+            var circle = new THREE.Mesh( mark, markMaterial );
+
+            // 获取标记点坐标
+            var markPos1 = getPosition(_markData[i].x, _markData[i].y, 3);
+            var markPos2 = getPosition(_markData[i].x, _markData[i].y, _markData[i].h+3);
+            var markPos3 = getPosition(_markData[i].x, _markData[i].y, _markData[i].h+3.01);
+
+
+            var geometry111 = new THREE.Geometry();
+            geometry111.vertices.push(
+            new THREE.Vector3(markPos1.x, markPos1.y, markPos1.z),
+            new THREE.Vector3(markPos2.x, markPos2.y, markPos2.z)
+            );
+
+            var geometry222 = new THREE.Geometry();
+            geometry222.vertices.push(
+                new THREE.Vector3(markPos2.x, markPos2.y, markPos2.z),
+                new THREE.Vector3(markPos3.x, markPos3.y, markPos3.z)
+            );
+
+            //渐变线样式
+       /*     geometry111.colors.push(
+                new THREE.Color( 0xffffff ),
+                new THREE.Color( 0xFF0000 )
+            )*/
+
+
+            var material111 = new THREE.LineBasicMaterial({
+                //vertexColors: true,
+                transparent: true,
+                blending:THREE.AdditiveBlending,
+                color:new THREE.Color("rgb(255, 56, 56)")
+            });
+
+            var material222 = new THREE.LineBasicMaterial({
+                color:0xffffff
+            });
+
+            var line111 = new THREE.Line(geometry111, material111);
+            var line222 = new THREE.Line(geometry222, material222);
+            var lineGroup = new THREE.Group;
+
+
+            var coordVec3 = new THREE.Vector3(markPos1.x, markPos1.y, markPos1.z).normalize();
+            var meshNormal = new THREE.Vector3(0, 0, 1);
+            circle.quaternion.setFromUnitVectors(meshNormal, coordVec3);
+            circle.position.set(markPos1.x, markPos1.y, markPos1.z);
+            marking.add(circle);
+
+
+            lineGroup.add(line111);
+            lineGroup.add(line222);
+            lineGroup.add(marking);
+            scene.add(lineGroup);
+
+        }
+
+
+        function getPosition(_longitude, _latitude, _radius) {
+            var lg = THREE.Math.degToRad(_longitude);
+            var lt = THREE.Math.degToRad(_latitude);
+            var temp = _radius * Math.cos(lt);
+            var x = temp * Math.sin(lg);
+            var y = _radius * Math.sin(lt);
+            var z = temp * Math.cos(lg);
+            return {
+                x: x,
+                y: y,
+                z: z
+            }
+        }
+
+
+
+
+        /*HDR*/
+        const pmremGenerator = new THREE.PMREMGenerator(renderer) // 使用hdr作为背景色
+        pmremGenerator.compileEquirectangularShader()
+        new RGBELoader()
+            .setDataType(THREE.UnsignedByteType)
+            .load('hdr/10.hdr', function(texture) {
+                const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                envMap.isPmremTexture = true
+                pmremGenerator.dispose()
+
+                scene.environment = envMap  // 给场景添加环境光效果
+                //scene.background = envMap // 给场景添加背景图
+
+            })
+
+        //group2.rotation.x = -Math.PI/2
+        //group2.rotation.y = 0
+
+
+
+        //缩放
+     /*   var num = 9
+        var num1
+        var cp = camera.position
+
+
+        var scrollFunc=function(e) {
+            e = e || window.event;
+            if (e.wheelDelta) {
+                var v = e.wheelDelta;
+
+
+                if (v > 0) {
+                    if (num < 20) {
+                        num = num + 0.8
+                        num1 = num - 0.8
+
+                        TweenMax.to(cp, 0.4, {
+                            x:camera.position.x*num/num1, ease: Power1.easeInOut,  onComplete: function () {}
+                        });
+                        TweenMax.to(cp, 0.4, {
+                            y:camera.position.y*num/num1, ease: Power1.easeInOut,  onComplete: function () {}
+                        });
+                        TweenMax.to(cp, 0.4, {
+                            z:camera.position.z*num/num1, ease: Power1.easeInOut,  onComplete: function () {}
+                        });
+
+
+                    }
+                } else if (v < 0) {
+                    if (num > 2) {
+                        num = num - 0.8
+                        num1 = num + 0.8
+
+                       TweenMax.to(cp, 0.4, {
+                            x:camera.position.x*num/num1, ease: Power1.easeInOut,  onComplete: function () {}
+                        });
+                        TweenMax.to(cp, 0.4, {
+                            y:camera.position.y*num/num1, ease: Power1.easeInOut,  onComplete: function () {}
+                        });
+                        TweenMax.to(cp, 0.4, {
+                            z:camera.position.z*num/num1, ease: Power1.easeInOut,  onComplete: function () {}
+                        });
+
+                    }
+                }
+
+                console.log(camera.position.x)
+
+
+
+            }
+        }
+
+        */
+
+        /*注册事件*/
+/*        if(document.addEventListener){
+            document.addEventListener('DOMMouseScroll',scrollFunc,false);
+            }//W3C
+        window.onmousewheel=document.onmousewheel=scrollFunc;*/
+
+        const animate = function () {
+            requestAnimationFrame( animate );
+            onWindowResize();
+            controls.update();
+            controls.autoRotate=true;
+            controls.zoomSpeed = 0.4;
+            controls.enableDamping=true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+
+
+
+
+            /*      controls.smoothZoom = true;
+                  controls.zoomDampingFactor = 0.2;
+                  controls.smoothZoomSpeed = 5.0;*/
+
+
+            //console.log("x:"+sx +"y:"+ sy +"z:"+ sz)
+
+
+            //console.log(controls.getAzimuthalAngle())
+
+            scene.getObjectByName("Plane").rotation.y = controls.getAzimuthalAngle() + Math.PI/2;
+            scene.getObjectByName("Plane").rotation.z = controls.getPolarAngle();
+
+            scene.getObjectByName("Cylinder").rotation.y = controls.getAzimuthalAngle() + Math.PI/2;
+            scene.getObjectByName("Cylinder").rotation.z = controls.getPolarAngle() + Math.PI/2;
+
+
+            scene.getObjectByName("CylinderText").rotation.y = controls.getAzimuthalAngle() + Math.PI/2;
+            scene.getObjectByName("CylinderText").rotation.z = controls.getPolarAngle() + Math.PI/2;
+
+
+            scene.getObjectByName("top").rotation.y = controls.getAzimuthalAngle() + Math.PI/2;
+            scene.getObjectByName("top").rotation.z = controls.getPolarAngle()- Math.PI/2;
+
+
+            scene.getObjectByName("bottom").rotation.y = controls.getAzimuthalAngle() + Math.PI/2;
+            scene.getObjectByName("bottom").rotation.z = controls.getPolarAngle()- Math.PI/2;
+
+
+          /*  if(camera.position.x>10){
+            camera.position.x -=0.05;
+            }
+*/
+
+
+
+           //controls.maxAzimuthAngle = Math.PI/2
+           //controls.minAzimuthAngle = Math.PI/2
+
+
+
+            //group2.rotation.x =controls.getPolarAngle() - Math.PI/2;         //垂直
+            //group2.rotation.y =controls.getAzimuthalAngle();                 //水平
+
+
+            //console.log("垂直" + controls.getPolarAngle()*180/3.1415926)
+            //console.log("水平" + controls.getAzimuthalAngle()*180/3.1415926)
+
+
+            textureBg.offset.x += 0.0001
+            textureBgText.offset.x += 0.0002
+            textureBottom.rotation += Math.PI/20000
+            textureBottom.center.set(0.5,0.5);
+
+
+            //camera.position.set(camera.position.x*(obj.num1+obj.r)/(obj.num+obj.r),camera.position.y*(obj.num1+obj.r)/(obj.num+obj.r),camera.position.z*(obj.num1+obj.r)/(obj.num+obj.r))
+
+
+    /*        camera.position.y = camera.position.y*obj.num1/obj.num
+            camera.position.z = camera.position.z*obj.num1/obj.num*/
+
+            //console.log(obj.num)
+
+
+            renderer.render( scene, camera );
+        };
+
+        function onWindowResize() {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize( window.innerWidth, window.innerHeight );
+
+        }
+
+        animate();
+
+
+    </script>
+
+</head>
+<body>
+</body>
+</html>
