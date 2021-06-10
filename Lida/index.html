@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link type="text/css" rel="styleSheet"  href="style.css" />
+    <style type="text/css">
+        @font-face {
+            font-family: 'zcool';
+            src: url('font/zcool.ttf') format('truetype')
+        }
+        canvas{
+            letter-spacing: 5px;
+        }
+        #loading{
+            text-align: center;
+            padding-top: 100px;
+        }
+        .aa{
+            position: absolute;
+            z-index: -111;
+            left: 0;
+            top:0;
+            opacity: 0;
+
+        }
+        #myCanvas{
+            position: absolute;
+            z-index: -111;
+            opacity: 0;
+        }
+
+     .btn{
+         position: fixed;
+         bottom: 100px;
+         width: 100%;
+         transform: translateX(50%);
+         margin-left: -80px;
+         color: aliceblue;
+
+     }
+        .btn button{
+            padding: 10px 20px;
+            border: 1px solid #217D00;
+            font-size: 18px;
+            background: 0,0,0,0;
+            color: #42FF00;
+        }
+
+
+    </style>
+    <script src="lib/JQ.js"></script>
+    <script src="https://gw.alipayobjects.com/os/lib/lottie-web/5.5.6/build/player/lottie.min.js"></script>
+    <script type="module">
+
+
+
+        window.addEventListener('message', function (event) {
+            console.log(`子窗口捕获消息`)
+        })
+
+        function sendPost() {
+            var messageObj = { text:'子窗口给父窗口传值', a: 111111, b: 2 }
+            // 向该窗口发送消息       
+            window.parent.postMessage(messageObj, "*");
+        }
+
+        sendPost()
+
+
+        var alphaV
+        var betaV
+        var gammaV
+
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', function (event) {
+                var a = document.getElementById('alpha'),
+                    b = document.getElementById('beta'),
+                    g = document.getElementById('gamma'),
+                    alpha = event.alpha,
+                    beta = event.beta,
+                    gamma = event.gamma;
+
+                a.innerHTML = alpha;
+                b.innerHTML = beta;
+                g.innerHTML = gamma;
+
+                alphaV = alpha;
+                betaV = beta;
+                gammaV = gamma;
+
+            }, false);
+        } else {
+            document.querySelector('body').innerHTML = '你的浏览器不支持陀螺仪';
+        }
+
+
+
+
+
+        $('.Gravity').on('click',function(){
+            // ios 提示授权， 返回的是一个 promise
+            window.DeviceOrientationEvent.requestPermission()
+                .then(state => {
+                    if(state === "granted"){//允许
+                        alert("允许使用陀螺仪：",state)
+                    }else if(state === "denied"){//拒绝
+                        alert("拒绝使用陀螺仪：",state)
+                    }else if(state === "prompt"){
+                        alert("用户进行其他操作：",state)
+                    }
+                })
+        })
+
+
+
+
+        import * as THREE from 'https://unpkg.com/three@0.123.0/build/three.module.js'
+        import { GLTFLoader } from './lib/GLTFLoader.js'
+        import { RGBELoader } from './lib/RGBELoader.js'
+        import { OrbitControls } from './lib/OrbitControls.js'
+
+
+
+
+        var btnbq = document.getElementById("btnbq");
+        var btntext = document.getElementById("btntext");
+
+        btnbq.addEventListener("click",function () {
+            ch()
+        })
+        btntext.addEventListener("click",function () {
+            ch2()
+        })
+
+
+
+
+        let promise;
+        let aa;
+        let bb;
+        let cc;
+        let mesh;
+        let texture;
+        let texture1;
+        let weather
+        let msg
+
+
+
+
+
+        /*--------------------------------*/
+
+
+        //文本
+        var createCanvas = function (w,h) {
+            w = w || 512;
+            h = h || 512;
+            //var cs = document.createElement('canvas')
+            var cs=document.getElementById("myCanvas");
+
+
+
+
+
+            var cxt = cs.getContext('2d');
+            cs.width = w;
+            cs.height = h;
+
+
+            function ani() {
+
+                msg = weather;
+                //console.log(msg)
+                var gradient = cxt.createLinearGradient(0, 0, 256, 0);
+                gradient.addColorStop(0,'#00ffcc');
+                gradient.addColorStop(0.5,'#5FFFF3');
+                gradient.addColorStop(1,'#00ffcc');
+
+                let distance = 20;
+                const speed = 0;
+
+
+                function draw(){
+
+                    cxt.clearRect(0,0,256,256);
+
+                    cxt.save();
+                    cxt.fillStyle="#000";
+                    cxt.fillRect(0,0,256,256);
+
+
+                    // 设置字体
+                    cxt.font = "60px 'Tahoma'";
+                    // 设置颜色
+                    cxt.fillStyle = gradient;
+
+                    // 设置水平对齐方式
+                    cxt.textAlign = "left";
+                    // 设置垂直对齐方式
+                    cxt.textBaseline = "middle";
+                    cxt.shadowColor = "#00ffcc";  //定义投影颜色为蓝色
+                    cxt.shadowBlur = 10;   //定义投影模糊阶数为15像素
+
+                    cxt.fillText(msg, distance, 55);
+
+                    cxt.restore();
+
+                    var s = 3;
+
+                    cxt.beginPath();
+
+                    for (var n=0;n<44; n++){
+
+                        cxt.lineWidth = 1;
+                        cxt.strokeStyle='#202222';
+                        cxt.moveTo(0,n*s+0.5);
+                        cxt.lineTo(256,n*s+0.5);
+
+                        cxt.stroke();
+                    }
+
+                    cxt.closePath();
+
+                    distance = distance + speed;
+                    requestAnimationFrame(draw);
+                }
+
+                draw();
+
+                cxt.restore();
+
+
+            }
+            ani();
+
+            //setInterval("ani()", 1000);
+
+            //console.log(cs)
+
+            return cs;
+
+
+
+        }
+        var text = createCanvas(128,128)
+
+       function ch(){
+
+            texture1 = new THREE.CanvasTexture(text);
+            mesh.material.map = texture1;
+            mesh.material.map.flipY = false;//纹理贴图反转
+            //console.log(mesh.material.map)
+
+        }
+        function ch2(){
+
+            texture1 = new THREE.CanvasTexture(bb);
+            mesh.material.map = texture1;
+            mesh.material.map.flipY = false;//纹理贴图反转
+            //console.log(mesh.material.map)
+
+        }
+
+
+        let biaoqingarr = [
+            {
+                class:"ca",
+                url:"1.json"
+            },
+            {
+                class:"ca",
+                url:"1.json"
+            },
+            {
+                class:"ca",
+                url:"1.json"
+            }
+        ]
+
+
+        function biaoqing() {
+            for(var i = 0; i<biaoqingarr.length; i++){
+                window["ruelsLottie"+i] = lottie.loadAnimation({
+                    path:'./3.json',
+                    loop:true,
+                    autoplay:true,
+                    renderer:'canvas',
+                    container: document.getElementById("myCanvas1"), // 容器 //渲染方式，有"html"、"canvas"和"svg"三种
+
+
+                    rendererSettings: {
+                        //context: canvasContext, // the canvas context
+                        scaleMode: 'noScale',
+                        clearCanvas: true,
+                        progressiveLoad: false, // Boolean, only svg renderer, loads dom elements when needed. Might speed up initialization for large number of elements.
+                        hideOnTransparent: true, //Boolean, only svg renderer, hides elements when opacity reaches 0 (defaults to true)
+                        className: 'ca',
+                        //id: 'ca'
+                    }
+
+                });
+
+            }
+        }
+        biaoqing();
+
+
+        promise = new Promise(function (resolve,reject) {
+
+            ruelsLottie1.addEventListener("DOMLoaded",function () {
+
+                bb = document.getElementById('myCanvas1').getElementsByTagName('canvas')[0];
+                resolve(bb);
+                reject();
+
+            })
+
+
+
+        })
+        promise.then(function (data) {
+
+
+            bb = data;
+
+
+           /*-------------------------------------------------*/
+
+
+            //模型初始化
+
+                const scene = new THREE.Scene();
+                var controls;
+                //const camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 1000 );
+
+                const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+                camera.position.z = 550;
+                const renderer = new THREE.WebGLRenderer({antialias: true,});
+                renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize( window.innerWidth, window.innerHeight );
+                document.body.appendChild( renderer.domElement );
+
+                var ambientLight = new THREE.AmbientLight( 0xF5F9FF, 0.3 );
+                scene.add( ambientLight );
+
+                /*加载模型*/
+                var loader = new GLTFLoader();
+
+                loader.load('mode/lida.glb', function (gltf) {
+
+                        gltf.scene.scale.set(1,1,1);
+                        gltf.scene.position.set(0,0,0);
+                        gltf.scene.rotateY(-Math.PI/2);
+
+
+                        gltf.scene.children[4].material.transparent = true;
+                        gltf.scene.children[4].material.opacity = 0.3;
+                        gltf.scene.children[4].material.side = THREE.FrontSide //透明度添加以后解决破面问题
+
+
+
+
+                        gltf.scene.children[5].position.set(-1,0,0);
+                        gltf.scene.children[5].material.transparent = true;
+                        gltf.scene.children[5].material.opacity = 0.7;
+
+
+                        mesh = gltf.scene.children[6];
+                        mesh.material = material;
+                        mesh.material.map.flipY = false;//纹理贴图反转
+
+
+                        scene.add(gltf.scene);
+                        var obj = gltf.scene;
+
+                        //scene.add(point)
+
+                        obj.traverse( function ( child ) {
+                        } )
+                    },
+                    function ( xhr ) {
+                        if(xhr.loaded / xhr.total * 100 == "100")
+                        {
+
+                        }
+                    }
+                );
+
+
+                /*HDR*/
+                const pmremGenerator = new THREE.PMREMGenerator(renderer)
+                pmremGenerator.compileEquirectangularShader()
+                new RGBELoader()
+                    .setDataType(THREE.UnsignedByteType)
+                    .load('1.hdr', function(texture) {
+                        const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                        envMap.isPmremTexture = true
+                        pmremGenerator.dispose()
+
+                        scene.environment = envMap  // 给场景添加环境光效果
+                        //scene.background = envMap // 给场景添加背景图
+
+                    })
+
+
+                controls = new OrbitControls( camera, renderer.domElement );
+                controls.autoRotate=false;
+                controls.zoomSpeed = 0.4;
+                controls.enableDamping=true;
+                controls.dampingFactor = 0.05;
+                controls.screenSpacePanning = false;
+                //controls.maxPolarAngle = Math.PI/2.1;
+
+
+
+
+                texture = new THREE.CanvasTexture(bb)
+                var material = new THREE.MeshBasicMaterial({
+                    map: texture,
+                    side:THREE.DoubleSide,
+
+                })
+
+
+
+
+
+                function render() {
+                    requestAnimationFrame(render)
+                    texture.needsUpdate = true;
+                    if(texture1){
+                        texture1.needsUpdate = true;
+                    }
+
+
+                    renderer.render(scene, camera);
+                    scene.rotation.y = gammaV * Math.PI/180/1.5
+                    scene.rotation.x = betaV * Math.PI/180/3 - 0.2
+                    controls.update();
+
+
+
+
+                }
+
+                render()
+
+
+
+           /*-------------------------------------------------*/
+
+
+
+        },function () {
+            console.log(222)
+
+        })
+
+
+
+
+
+
+
+        /*--------------------------------*/
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+</head>
+<body style="background:transparent;">
+<div class="btn">
+    alpha:<span id="alpha"></span><br/>
+    beta:<span id="beta"></span><br/>
+    gamma:<span id="gamma"></span><br/>
+<button class="Gravity" id="btnbq">表情</button>
+<button id="btntext">文字</button>
+</div>
+<canvas id="myCanvas" width="128" height="128"></canvas>
+<div class="aa" id="myCanvas1" style="width:256px;height:256px"></div>
+<div style="font-family: zcool; display: none">.</div>
+<div id="loop"></div>
+
+</body>
+</html>
